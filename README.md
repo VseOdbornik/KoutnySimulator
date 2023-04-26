@@ -1,2 +1,2 @@
 # KoutnySimulator
- Ahoj. Tohle je moje hra a mojí škole.
+ Neseriózní hra o naší škole. Pro více informací mi napiš DM.
