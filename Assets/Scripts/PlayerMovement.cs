@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     float movementX;
     float lastMovementX = 1;
-    bool isWallJumping;
+    //bool isWallJumping;
     bool isHolding;
     [SerializeField] float movementSpeed;
     [SerializeField] float checkSize;
@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
 
         if(movementX != 0) lastMovementX= movementX;
 
-        transform.Translate(new Vector3(movementX * movementSpeed * 0.1f, 0));
+        Walk();
         
         if (movementX != 0)
         {
@@ -41,18 +41,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            if (IsTouchingSomething(groundCheck)) Jump();
-            else if (IsTouchingSomething(rightWallCheck) && isHolding) WallJump(false);
+            StopHolding();
+            if (IsTouchingSomething(rightWallCheck)) WallJump();
+            else if (IsTouchingSomething(groundCheck)) Jump();
         }
         if (Input.GetKey(KeyCode.LeftShift))
         {
             Hold();
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            StopHolding();
         }
         FlipCharacter(lastMovementX);
     }
@@ -64,6 +62,11 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = scale;
     }
 
+    void Walk()
+    {
+        rb.velocity = new Vector2(movementX * movementSpeed * Time.deltaTime, rb.velocity.y);
+    }
+
     void Jump()
     {
         rb.AddForce(new Vector3(0, 12), ForceMode2D.Impulse);
@@ -71,27 +74,29 @@ public class PlayerMovement : MonoBehaviour
 
     void Hold()
     {
-        if (!IsTouchingSomething(rightWallCheck) || isWallJumping) return;
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            StopHolding();
+            return;
+        }
+        if (!IsTouchingSomething(rightWallCheck) /*|| isWallJumping*/) return;
 
         isHolding = true;
         rb.velocity = Vector3.zero;
-        print("Holding");
+        rb.gravityScale = 0;
     }
 
     void StopHolding()
     {
         isHolding = false;
-        print("NotHolding");
+        rb.gravityScale = 2;
     }
 
-    void WallJump(bool toRight)
+    void WallJump()
     {
-        StopHolding();
-        StartCoroutine(WallJumping());
-        if (toRight)
-            rb.velocity += new Vector2(5, 7);
-        else if(!toRight)
-            rb.velocity += new Vector2(-5, 7);
+        //StartCoroutine(WallJumping());
+        rb.velocity += new Vector2(-5 * lastMovementX, 7);
+        print("WJ");
     }
 
     bool IsTouchingSomething(Transform checkSide)
@@ -102,13 +107,13 @@ public class PlayerMovement : MonoBehaviour
         else
             return false;
     }
-
+    /*
     IEnumerator WallJumping()
     {
         isWallJumping = true;
-        yield return new WaitForSeconds(1);
+        yield return null;
         isWallJumping = false;
-    }
+    }*/
 
     private void OnDrawGizmos()
     {
