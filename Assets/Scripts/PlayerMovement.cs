@@ -4,14 +4,22 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+
     float movementX;
+    float movementY;
+    Vector2 dir;
+
+    const int walkCoeficient = 300;
+    const int jumpCoeficient = 11;
+
+    [SerializeField] float coyoteTime = .1f;
+    [SerializeField] float coyoteTimeCounter = .1f;
+
     float lastMovementX = 1;
-    //bool isWallJumping;
-    bool isHolding;
-    [SerializeField] float movementSpeed;
-    [SerializeField] float checkSize;
+    const float checkSize = 0.05f;
+    [SerializeField] float movementSpeed = 1;
+    [SerializeField] float jumpForce = 1;
     [SerializeField] Transform groundCheck;
-    //[SerializeField] Transform leftWallCheck;
     [SerializeField] Transform rightWallCheck;
     Rigidbody2D rb;
 
@@ -22,37 +30,41 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(!isHolding) movementX = Input.GetAxisRaw("Horizontal");
-
-        if(movementX != 0) lastMovementX= movementX;
+        movementX = Input.GetAxisRaw("Horizontal");
+        movementY = Input.GetAxisRaw("Vertical");
+        dir = new Vector2(movementX, movementY);
+        if (movementX != 0) lastMovementX= movementX;
 
         Walk();
-        
-        if (movementX != 0)
-        {
-            Vector2 currentVelocity = rb.velocity;
-            currentVelocity.x = 0f;
-            rb.velocity = currentVelocity;
-        }
-
-        //rb.AddForce(transform.position + new Vector3(movementX * movementSpeed, 0), ForceMode2D.Impulse);
-        //transform.position += new Vector3(movementX * movementSpeed * 0.1f, 0);
+        FlipCharacter(lastMovementX);
     }
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (IsGrounded())
         {
-            StopHolding();
-            if (IsTouchingSomething(rightWallCheck)) WallJump();
-            else if (IsTouchingSomething(groundCheck)) Jump();
+            coyoteTimeCounter = coyoteTime;
         }
-        if (Input.GetKey(KeyCode.LeftShift))
+        else
         {
-            Hold();
+            coyoteTimeCounter -= Time.deltaTime;
         }
-        FlipCharacter(lastMovementX);
+    }
+
+    void Walk()
+    {
+        rb.velocity = new Vector2(movementX * movementSpeed * Time.deltaTime * walkCoeficient, rb.velocity.y);
+    }
+
+    void Jump()
+    {
+        if (!IsGrounded() && coyoteTimeCounter <= 0) return;
+
+        coyoteTimeCounter = 0;
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.velocity += Vector2.up * jumpForce * jumpCoeficient;
     }
 
     void FlipCharacter(float leftOrRight)
@@ -62,64 +74,19 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = scale;
     }
 
-    void Walk()
+    bool IsGrounded()
     {
-        rb.velocity = new Vector2(movementX * movementSpeed * Time.deltaTime, rb.velocity.y);
-    }
-
-    void Jump()
-    {
-        rb.AddForce(new Vector3(0, 12), ForceMode2D.Impulse);
-    }
-
-    void Hold()
-    {
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            StopHolding();
-            return;
-        }
-        if (!IsTouchingSomething(rightWallCheck) /*|| isWallJumping*/) return;
-
-        isHolding = true;
-        rb.velocity = Vector3.zero;
-        rb.gravityScale = 0;
-    }
-
-    void StopHolding()
-    {
-        isHolding = false;
-        rb.gravityScale = 2;
-    }
-
-    void WallJump()
-    {
-        //StartCoroutine(WallJumping());
-        rb.velocity += new Vector2(-5 * lastMovementX, 7);
-        print("WJ");
-    }
-
-    bool IsTouchingSomething(Transform checkSide)
-    {
-        Collider2D[] colls = Physics2D.OverlapCircleAll(checkSide.position, checkSize);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, new Vector2(0.65f, 0.2f),0);
         if (colls.Length > 1)
             return true;
         else
             return false;
     }
-    /*
-    IEnumerator WallJumping()
-    {
-        isWallJumping = true;
-        yield return null;
-        isWallJumping = false;
-    }*/
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, checkSize);
-        //Gizmos.DrawWireSphere(leftWallCheck.position, checkSize);
-        Gizmos.DrawWireSphere(rightWallCheck.position, checkSize);
+        Gizmos.DrawWireCube(groundCheck.position, new Vector2(0.65f, 0.2f));
+        //Gizmos.DrawWireSphere(rightWallCheck.position, checkSize);
     }
 }
