@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    Rigidbody2D rb;
 
-    float movementX;
-    float movementY;
-    Vector2 dir;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] Transform wallCheck;
 
     const int walkCoeficient = 300;
     const int jumpCoeficient = 11;
 
+    float movementX;
+    float movementY;
+    float lastMovementX = 1;
+    Vector2 dir;
+
+    [SerializeField] float movementSpeed = 1;
+    [SerializeField] float jumpForce = 1;
+
     [SerializeField] float coyoteTime = .1f;
     [SerializeField] float coyoteTimeCounter = .1f;
 
-    float lastMovementX = 1;
-    const float checkSize = 0.05f;
-    [SerializeField] float movementSpeed = 1;
-    [SerializeField] float jumpForce = 1;
-    [SerializeField] Transform groundCheck;
-    [SerializeField] Transform rightWallCheck;
-    Rigidbody2D rb;
+    bool isHolding;
 
     private void Start()
     {
@@ -41,9 +43,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyUp(KeyCode.LeftShift) || !OnWall()) StopHolding();
+        if (Input.GetKey(KeyCode.LeftShift) && OnWall()) Hold();
         if (Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        if (IsGrounded()) coyoteTimeCounter = coyoteTime;
+        if (OnGround()) coyoteTimeCounter = coyoteTime;
         else coyoteTimeCounter -= Time.deltaTime;
 
         if (Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0) rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
@@ -56,11 +60,22 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
-        if (!IsGrounded() && coyoteTimeCounter <= 0) return;
+        if (!OnGround() && coyoteTimeCounter <= 0) return;
 
         coyoteTimeCounter = 0;
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.velocity += Vector2.up * jumpForce * jumpCoeficient;
+    }
+
+    void Hold()
+    {
+        rb.gravityScale = 0;
+        rb.velocity = Vector2.zero;
+    }
+
+    void StopHolding()
+    {
+        rb.gravityScale = 2.2f;
     }
 
     void FlipCharacter(float leftOrRight)
@@ -70,19 +85,24 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = scale;
     }
 
-    bool IsGrounded()
+    bool OnGround()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, new Vector2(0.65f, 0.2f),0);
-        if (colls.Length > 1)
-            return true;
-        else
-            return false;
+        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, new Vector2(0.65f, 0.12f),0);
+        if (colls.Length > 1) return true;
+        else return false;
+    }
+
+    bool OnWall()
+    {
+        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, new Vector2(0.1f, 1f), 0);
+        if (colls.Length > 1) return true;
+        else return false;
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(groundCheck.position, new Vector2(0.65f, 0.2f));
-        //Gizmos.DrawWireSphere(rightWallCheck.position, checkSize);
+        Gizmos.DrawWireCube(groundCheck.position, new Vector2(0.65f, 0.12f));
+        Gizmos.DrawWireCube(wallCheck.position, new Vector2(0.1f, 1f));
     }
 }
