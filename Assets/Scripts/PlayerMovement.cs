@@ -43,14 +43,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        if (IsGrounded())
-        {
-            coyoteTimeCounter = coyoteTime;
-        }
-        else
-        {
-            coyoteTimeCounter -= Time.deltaTime;
-        }
+        if (IsGrounded()) coyoteTimeCounter = coyoteTime;
+        else coyoteTimeCounter -= Time.deltaTime;
+
+        if (Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0) rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
     }
 
     void Walk()
