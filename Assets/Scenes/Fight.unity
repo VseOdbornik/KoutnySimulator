@@ -1610,8 +1610,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDrag: 1
+  m_AngularDrag: 0
   m_GravityScale: 2.2
   m_Material: {fileID: 6200000, guid: 5fe275a6b17d9c747a8e2f068cd6a689, type: 2}
   m_Interpolate: 0
@@ -1656,8 +1656,15 @@ MonoBehaviour:
   wallCheck: {fileID: 126644428}
   movementSpeed: 1
   jumpForce: 1
+  wallFriction: 0.8
+  slideSpeed: 0.5
+  wallJumpTime: 0.5
+  wallJumpMoveSpeed: 10
   coyoteTime: 0.1
   coyoteTimeCounter: 0.1
+  wallGrab: 0
+  cantWalk: 0
+  wallJumped: 0
 --- !u!66 &1534391599
 CompositeCollider2D:
   m_ObjectHideFlags: 0
