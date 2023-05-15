@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
+    PlayerAnimation playerAnimation;
 
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform wallCheck;
@@ -14,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float wallJumpCoefficient = 1.8f;
 
     float facingDirectionX = 1;
-    Vector2 dir;
+    [SerializeField] Vector2 dir;
 
     [SerializeField] float movementSpeed = 1;
     [SerializeField] float jumpForce = 1;
@@ -28,12 +29,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] bool onGround;
     [SerializeField] bool onWall;
     [SerializeField] bool isHolding;
+    [SerializeField] bool isCrouching;
     [SerializeField] bool cantWalk;
     [SerializeField] bool wallJumped;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerAnimation = GetComponent<PlayerAnimation>();
     }
 
     private void FixedUpdate()
@@ -48,19 +51,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        SetBools();
+        onGround = OnGround();
+        onWall = OnWall();
 
-        if (Input.GetKeyUp(KeyCode.LeftShift) || !onWall)
-        {
-            StopHold();
-        }
+        if (!IsHolding()) StopHold();
+        else StartHolding();
 
-        if(Input.GetKey(KeyCode.LeftShift) && onWall && !wallJumped)
-        {
+        isCrouching = IsCrouching();
 
-            if (!isHolding) StartHolding();
-            //else Hold();
-        }
+
+        if (dir.x != 0 && onGround) playerAnimation.Walk();
+        else if (dir.y != 0 && isHolding) playerAnimation.HoldWalk();
+        else if (isHolding) playerAnimation.Hold();
+        else playerAnimation.Idle();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -68,10 +71,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
-            else if(onWall)
+            else if (onWall)
             {
                 WallJump();
-            } 
+            }
         }
         if (onGround)
         {
@@ -91,15 +94,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (dir.x != 0) facingDirectionX = dir.x;
 
-        if(!isHolding)
-        FlipCharacter(facingDirectionX);
-    }
-
-    void SetBools()
-    {
-        onGround = OnGround();
-        onWall = OnWall();
-        isHolding = IsHolding();
+        if(!isHolding) FlipCharacter(facingDirectionX);
     }
 
     void Walk()
@@ -147,11 +142,6 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = 0;
     }
 
-    void Hold()
-    {
-        //rb.velocity = new Vector2(0, rb.velocity.y);
-    }
-
     void StopHold()
     {
         rb.gravityScale = 2.2f;
@@ -168,20 +158,23 @@ public class PlayerMovement : MonoBehaviour
     bool OnGround()
     {
         Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, new Vector2(0.65f, 0.12f), 0);
-        if (colls.Length > 1) return true;
-        else return false;
+        return (colls.Length > 1);
     }
 
     bool OnWall()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, new Vector2(0.1f, 1f), 0);
-        if (colls.Length > 1) return true;
-        else return false;
+        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, new Vector2(0.1f, 0.5f), 0);
+        return (colls.Length > 1);
     }
 
     bool IsHolding()
     {
-        return onWall && Input.GetKeyDown(KeyCode.LeftShift);
+        return onWall && Input.GetKey(KeyCode.LeftShift) && !wallJumped && !isCrouching;
+    }
+
+    bool IsCrouching()
+    {
+        return onGround && Input.GetKey(KeyCode.S) && !wallJumped && !isHolding;
     }
 
     void StartWallJump(float time)
@@ -219,6 +212,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(groundCheck.position, new Vector2(0.65f, 0.12f));
-        Gizmos.DrawWireCube(wallCheck.position, new Vector2(0.1f, 1f));
+        Gizmos.DrawWireCube(wallCheck.position, new Vector2(0.1f, 0.5f));
     }
 }
