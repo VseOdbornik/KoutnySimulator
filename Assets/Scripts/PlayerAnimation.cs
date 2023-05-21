@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimation : MonoBehaviour
+public class PlayerAnimation : PlayerComponent
 {
     [SerializeField] Animator head, torso, legs;
     [SerializeField] string headAnimation, torsoAnimation, legsAnimation;
@@ -12,6 +12,7 @@ public class PlayerAnimation : MonoBehaviour
     const string PLAYER_HOLD = "Player_Hold";
     const string PLAYER_HOLDWALK = "Player_HoldWalk";
     const string PLAYER_CROUCH = "Player_Crouch";
+    const string PLAYER_HANG = "Player_Hang";
 
     void SetTorso(string newAnimation)
     {
@@ -53,5 +54,16 @@ public class PlayerAnimation : MonoBehaviour
     {
         SetTorso(PLAYER_HOLDWALK);
         SetLegs(PLAYER_HOLDWALK);
+    }
+    public void Hanging()
+    {
+        SetTorso(PLAYER_HANG);
+        SetLegs(PLAYER_IDLE);
+    }
+
+    public void Crouch()
+    {
+        SetTorso(PLAYER_CROUCH);
+        SetLegs(PLAYER_CROUCH);
     }
 }

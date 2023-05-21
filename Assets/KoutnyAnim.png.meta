@@ -260,7 +260,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -281,7 +281,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -302,7 +302,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -310,6 +310,27 @@ TextureImporter:
       bones: []
       spriteID: ea2fd47bdaab1a443b057af38e22672c
       internalID: -507994252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KoutnyAnim_10
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3273a3a382ea8b646b220d24f264c3d1
+      internalID: 917861950
       vertices: []
       indices: 
       edges: []
@@ -327,6 +348,7 @@ TextureImporter:
     nameFileIdTable:
       KoutnyAnim_0: -568647247
       KoutnyAnim_1: 2062690383
+      KoutnyAnim_10: 917861950
       KoutnyAnim_2: -1667431546
       KoutnyAnim_3: -1190296985
       KoutnyAnim_4: -412444640

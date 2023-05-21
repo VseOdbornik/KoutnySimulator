@@ -59,19 +59,19 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 5443335742036498613}
-    m_Position: {x: 370, y: 390, z: 0}
+    m_Position: {x: 440, y: 400, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5467482539453240680}
     m_Position: {x: 260, y: 320, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5491852974704795367}
-    m_Position: {x: 150, y: 390, z: 0}
+    m_Position: {x: 50, y: 390, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6853158072159884744}
-    m_Position: {x: 185, y: 455, z: 0}
+    m_Position: {x: 90, y: 520, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 7498818476538260798}
-    m_Position: {x: 220, y: 520, z: 0}
+    m_Position: {x: 400, y: 520, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -141,7 +141,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: KLegs_HoldWalk
+  m_Name: Player_HoldWalk
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -167,7 +167,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: KLegs_Hold
+  m_Name: Player_Hold
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []

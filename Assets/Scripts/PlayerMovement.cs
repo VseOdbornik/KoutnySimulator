@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : PlayerComponent
 {
-    Rigidbody2D rb;
     PlayerAnimation playerAnimation;
+    PlayerChecks checks;
 
-    [SerializeField] Transform groundCheck;
-    [SerializeField] Transform wallCheck;
+    Rigidbody2D rb;
+    BoxCollider2D bodyCollider;
+    Transform playerHeadTransform;
 
     [SerializeField] float walkCoefficient = 300;
     [SerializeField] float jumpCoefficient = 11;
@@ -28,15 +31,21 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] bool onGround;
     [SerializeField] bool onWall;
+    [SerializeField] bool isHanging;
     [SerializeField] bool isHolding;
     [SerializeField] bool isCrouching;
     [SerializeField] bool cantWalk;
     [SerializeField] bool wallJumped;
-
+    [SerializeField] bool canUncrouch;
+    [SerializeField] bool canClimbHigher;
+    
     private void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        playerAnimation = GetComponent<PlayerAnimation>();
+        rb = player.rb;
+        playerAnimation = player.animations;
+        checks = player.checks;
+        bodyCollider = player.bodyCollider;
+        playerHeadTransform = player.head.transform;
     }
 
     private void FixedUpdate()
@@ -51,30 +60,28 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        onGround = OnGround();
-        onWall = OnWall();
+        onGround = checks.OnGround();
+        onWall = checks.OnWall();
+        isHanging = checks.IsHanging();
+        canUncrouch = checks.CanUncrouch();
+        canClimbHigher = checks.CanClimbHigher();
 
         if (!IsHolding()) StopHold();
         else StartHolding();
 
-        isCrouching = IsCrouching();
+        if(!IsCrouching()) StopCrouching();
+        else StartCrouching();
 
-
-        if (dir.x != 0 && onGround) playerAnimation.Walk();
+        if(isCrouching) playerAnimation.Crouch();
+        else if (isHanging) playerAnimation.Hanging();
+        else if (dir.x != 0 && onGround) playerAnimation.Walk();
         else if (dir.y != 0 && isHolding) playerAnimation.HoldWalk();
         else if (isHolding) playerAnimation.Hold();
         else playerAnimation.Idle();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (onGround || coyoteTimeCounter > 0)
-            {
-                Jump();
-            }
-            else if (onWall)
-            {
-                WallJump();
-            }
+            Jump();
         }
         if (onGround)
         {
@@ -102,37 +109,60 @@ public class PlayerMovement : MonoBehaviour
         Vector2 walk = dir * movementSpeed * Time.deltaTime * walkCoefficient;
 
         if (!isHolding)
-        {
-            rb.velocity = new Vector2(walk.x, rb.velocity.y);
+        { 
+            if(!isCrouching) rb.velocity = new Vector2(walk.x, rb.velocity.y);
+            else rb.velocity = new Vector2(walk.x / 2, rb.velocity.y);
         }
         else
         {
+            if (walk.y > 0 && !canClimbHigher) return;
             rb.velocity = new Vector2(rb.velocity.x, walk.y) / 2;
         }
     }
 
     void Jump()
     {
-        coyoteTimeCounter = 0;
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.velocity += Vector2.up * jumpForce * jumpCoefficient;
+        if (onGround || coyoteTimeCounter > 0)
+        {
+            coyoteTimeCounter = 0;
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+            rb.velocity += Vector2.up * jumpForce * jumpCoefficient;
+        }
+        else if (onWall)
+        {
+            bool hold = isHolding;
+            StopHold();
+            StartWallJump(0.3f);
+
+            rb.velocity = Vector2.zero;
+            if (hold)
+            {
+                rb.velocity += new Vector2(dir.x, 1).normalized * jumpForce * jumpCoefficient;
+            }
+            else
+            {
+                rb.velocity += new Vector2(-facingDirectionX, 1).normalized * jumpForce * jumpCoefficient;
+            }
+        }
     }
 
-    void WallJump()
+    void StartCrouching()
     {
-        bool hold = isHolding;
-        StopHold();
-        StartWallJump(0.3f);
+        isCrouching = true;
 
-        rb.velocity = Vector2.zero;
-        if (hold)
-        {
-            rb.velocity += new Vector2(dir.x, 1).normalized * jumpForce * jumpCoefficient;
-        }
-        else
-        {
-            rb.velocity += new Vector2(-facingDirectionX, 1).normalized * jumpForce * jumpCoefficient;
-        }
+        bodyCollider.size = new Vector2(bodyCollider.size.x, 2.05f);
+        bodyCollider.offset = new Vector2(bodyCollider.offset.x, -0.21f);
+        playerHeadTransform.localPosition = new Vector2(playerHeadTransform.localPosition.x, 0.32f);
+    }
+
+    void StopCrouching()
+    {
+        if (!canUncrouch) return;
+
+        isCrouching = false;
+        bodyCollider.size = new Vector2(bodyCollider.size.x, 2.83f);
+        bodyCollider.offset = new Vector2(bodyCollider.offset.x, 0.18f);
+        playerHeadTransform.localPosition = new Vector2(playerHeadTransform.localPosition.x, 0.95f);
     }
 
     void StartHolding()
@@ -144,8 +174,8 @@ public class PlayerMovement : MonoBehaviour
 
     void StopHold()
     {
-        rb.gravityScale = 2.2f;
         isHolding = false;
+        rb.gravityScale = 2.2f;
     }
 
     void FlipCharacter(float leftOrRight)
@@ -155,18 +185,6 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = scale;
     }
 
-    bool OnGround()
-    {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, new Vector2(0.65f, 0.12f), 0);
-        return (colls.Length > 1);
-    }
-
-    bool OnWall()
-    {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, new Vector2(0.1f, 0.5f), 0);
-        return (colls.Length > 1);
-    }
-
     bool IsHolding()
     {
         return onWall && Input.GetKey(KeyCode.LeftShift) && !wallJumped && !isCrouching;
@@ -174,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
 
     bool IsCrouching()
     {
-        return onGround && Input.GetKey(KeyCode.S) && !wallJumped && !isHolding;
+        return onGround && Input.GetKey(KeyCode.S) && !wallJumped && !isHolding && !isHanging;
     }
 
     void StartWallJump(float time)
@@ -182,6 +200,7 @@ public class PlayerMovement : MonoBehaviour
         StopCoroutine(WallJump(time));
         StartCoroutine(WallJump(time));
     }
+
     IEnumerator WallJump(float time)
     {
         wallJumped = true;
@@ -208,10 +227,5 @@ public class PlayerMovement : MonoBehaviour
         cantWalk = false;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(groundCheck.position, new Vector2(0.65f, 0.12f));
-        Gizmos.DrawWireCube(wallCheck.position, new Vector2(0.1f, 0.5f));
-    }
+    
 }
