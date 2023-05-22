@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public SliderController healthController;
-    public TextMeshProUGUI healthAmountText;
 
     public GameObject head;
     public GameObject torso;

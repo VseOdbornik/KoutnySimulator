@@ -16,7 +16,6 @@ public class PlayerMovement : PlayerComponent
 
     [SerializeField] float walkCoefficient = 300;
     [SerializeField] float jumpCoefficient = 11;
-    [SerializeField] float wallJumpCoefficient = 1.8f;
 
     float facingDirectionX = 1;
     [SerializeField] Vector2 dir;
