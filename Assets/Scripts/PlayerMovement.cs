@@ -8,6 +8,7 @@ public class PlayerMovement : PlayerComponent
 {
     PlayerAnimation playerAnimation;
     PlayerChecks checks;
+    PlayerStats stats;
 
     Rigidbody2D rb;
     BoxCollider2D bodyCollider;
@@ -20,11 +21,7 @@ public class PlayerMovement : PlayerComponent
     float facingDirectionX = 1;
     [SerializeField] Vector2 dir;
 
-    [SerializeField] float movementSpeed = 1;
-    [SerializeField] float jumpForce = 1;
     [SerializeField] float slideSpeed;
-    [SerializeField] float wallJumpTime = .5f;
-    [SerializeField] int wallJumpMoveSpeed;
 
     [SerializeField] float coyoteTime = .1f;
     [SerializeField] float coyoteTimeCounter = .1f;
@@ -46,6 +43,7 @@ public class PlayerMovement : PlayerComponent
         checks = player.checks;
         bodyCollider = player.bodyCollider;
         playerHeadTransform = player.head.transform;
+        stats= player.stats;
     }
 
     private void FixedUpdate()
@@ -106,7 +104,7 @@ public class PlayerMovement : PlayerComponent
 
     void Walk()
     {
-        Vector2 walk = dir * movementSpeed * Time.deltaTime * walkCoefficient;
+        Vector2 walk = dir * Time.deltaTime * stats.WalkSpeed * walkCoefficient;
 
         if (!isHolding)
         { 
@@ -115,7 +113,7 @@ public class PlayerMovement : PlayerComponent
         }
         else
         {
-            if (walk.y > 0 && !canClimbHigher) return;
+            if (dir.y > 0 && !canClimbHigher) return;
             rb.velocity = new Vector2(rb.velocity.x, walk.y) / 2;
         }
     }
@@ -126,7 +124,7 @@ public class PlayerMovement : PlayerComponent
         {
             coyoteTimeCounter = 0;
             rb.velocity = new Vector2(rb.velocity.x, 0);
-            rb.velocity += Vector2.up * jumpForce * jumpCoefficient;
+            rb.velocity += Vector2.up * jumpCoefficient;
         }
         else if (onWall)
         {
@@ -137,11 +135,11 @@ public class PlayerMovement : PlayerComponent
             rb.velocity = Vector2.zero;
             if (hold)
             {
-                rb.velocity += new Vector2(dir.x, 1).normalized * jumpForce * jumpCoefficient;
+                rb.velocity += new Vector2(dir.x, 1).normalized * jumpCoefficient * stats.JumpForce;
             }
             else
             {
-                rb.velocity += new Vector2(-facingDirectionX, 1).normalized * jumpForce * jumpCoefficient;
+                rb.velocity += new Vector2(-facingDirectionX, 1).normalized * jumpCoefficient * stats.JumpForce;
             }
         }
     }

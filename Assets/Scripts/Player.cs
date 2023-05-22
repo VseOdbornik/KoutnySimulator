@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public SliderController healthController;
+    public TextMeshProUGUI healthAmountText;
+
     public GameObject head;
     public GameObject torso;
     public GameObject legs;
@@ -16,9 +20,9 @@ public class Player : MonoBehaviour
     [HideInInspector] public PlayerMovement movement;
     [HideInInspector] public PlayerAnimation animations;
     [HideInInspector] public PlayerChecks checks;
+    [HideInInspector] public PlayerStats stats;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         rb= GetComponent<Rigidbody2D>();
 
@@ -30,5 +34,8 @@ public class Player : MonoBehaviour
 
         checks = GetComponent<PlayerChecks>();
         checks.player = this;
+
+        stats = GetComponent<PlayerStats>();
+        stats.player = this;
     }
 }
