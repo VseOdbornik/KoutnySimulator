@@ -210,19 +210,4 @@ public class PlayerMovement : PlayerComponent
         StopCoroutine("WallJump");
         wallJumped = false;
     }
-
-    void StartCantWalk(float time)
-    {
-        StopCoroutine(CantWalk(time));
-        StartCoroutine(CantWalk(time));
-    }
-
-    IEnumerator CantWalk(float time)
-    {
-        cantWalk = true;
-        yield return new WaitForSeconds(time);
-        cantWalk = false;
-    }
-
-    
 }

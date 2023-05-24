@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerChecks : PlayerComponent
 {
+    [SerializeField] LayerMask wallLayer;
 
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform wallCheck;
@@ -19,32 +20,32 @@ public class PlayerChecks : PlayerComponent
 
     public bool OnGround()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, groundCheckBounds, 0);
-        return (colls.Length > 1);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(groundCheck.position, groundCheckBounds, 0, Layers.wallLayer);
+        return (colls.Length > 0);
     }
 
     public bool OnWall()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, wallCheckBounds, 0);
-        return (colls.Length > 1);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(wallCheck.position, wallCheckBounds, 0, Layers.wallLayer);
+        return (colls.Length > 0);
     }
 
     public bool CanClimbHigher()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(climbCheck.position, climbCheckBounds, 0);
-        return (colls.Length > 1);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(climbCheck.position, climbCheckBounds, 0, Layers.wallLayer);
+        return (colls.Length > 0);
     }
 
     public bool IsHanging()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(hangCheck.position, hangCheckBounds, 0);
-        return (colls.Length > 1);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(hangCheck.position, hangCheckBounds, 0, Layers.wallLayer);
+        return (colls.Length > 0);
     }
 
     public bool CanUncrouch()
     {
-        Collider2D[] colls = Physics2D.OverlapBoxAll(uncrouchCheck.position, uncrouchCheckBounds, 0);
-        return (colls.Length < 1);
+        Collider2D[] colls = Physics2D.OverlapBoxAll(uncrouchCheck.position, uncrouchCheckBounds, 0, Layers.wallLayer);
+        return (colls.Length < 0);
     }
 
     private void OnDrawGizmos()

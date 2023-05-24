@@ -323,7 +323,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -331,6 +331,27 @@ TextureImporter:
       bones: []
       spriteID: 3273a3a382ea8b646b220d24f264c3d1
       internalID: 917861950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KoutnyAnim_11
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 857b8a6b151a64244b45a5fdab13b3cd
+      internalID: -37823081
       vertices: []
       indices: 
       edges: []
@@ -349,6 +370,7 @@ TextureImporter:
       KoutnyAnim_0: -568647247
       KoutnyAnim_1: 2062690383
       KoutnyAnim_10: 917861950
+      KoutnyAnim_11: -37823081
       KoutnyAnim_2: -1667431546
       KoutnyAnim_3: -1190296985
       KoutnyAnim_4: -412444640

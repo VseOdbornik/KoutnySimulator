@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
     public GameObject head;
     public GameObject torso;
     public GameObject legs;
 
     public BoxCollider2D bodyCollider;
     public BoxCollider2D armCollider;
+
+    public float facingDirection = 1;
+    public Vector2 dir;
 
     [HideInInspector] public Rigidbody2D rb;
 
@@ -35,5 +37,11 @@ public class Player : MonoBehaviour
 
         stats = GetComponent<PlayerStats>();
         stats.player = this;
+    }
+
+    private void Update()
+    {
+        dir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        if (dir.x != 0) facingDirection = dir.x;
     }
 }
