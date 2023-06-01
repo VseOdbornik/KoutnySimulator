@@ -11,8 +11,8 @@ public class PlayerStats : PlayerComponent
     [SerializeField] SliderController staminaController;
     [SerializeField] TextMeshProUGUI staminaAmountText;
 
-    int _health = 100;
-    public int Health
+    float _health = 100;
+    public float Health
     {
         get { return _health; }
         set
@@ -23,8 +23,8 @@ public class PlayerStats : PlayerComponent
         }
     }
 
-    int _maxHealth = 100;
-    public int MaxHealth
+    float _maxHealth = 100;
+    public float MaxHealth
     {
         get { return _maxHealth; }
         set 
@@ -35,8 +35,8 @@ public class PlayerStats : PlayerComponent
         }
     }
 
-    int _stamina;
-    public int Stamina
+    float _stamina;
+    public float Stamina
     {
         get { return _stamina; }
         set 
@@ -45,24 +45,29 @@ public class PlayerStats : PlayerComponent
         }
     }
 
-    int _maxStamina;
-    public int MaxStamina
+    float _maxStamina;
+    public float MaxStamina
     {
         get { return _maxStamina; }
         set { _maxStamina = value; }
     }
 
-    int _walkSpeed = 1;
-    public int WalkSpeed
+    float _walkSpeed = 1;
+    public float WalkSpeed
     {
         get { return _walkSpeed; }
         set { _walkSpeed = value; }
     }
 
-    int _jumpForce = 1;
-    public int JumpForce
+    float _jumpForce = 1;
+    public float JumpForce
     {
         get { return _jumpForce; }
         set { _jumpForce = value; }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        Health -= damage;
     }
 }

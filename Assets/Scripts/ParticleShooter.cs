@@ -61,6 +61,8 @@ public class ParticleShooter : PlayerComponent
         if (player.dir.y != 0) particle.SetDirection(new Vector3(player.dir.x, player.dir.y));
         else particle.SetDirection(new Vector3(player.facingDirection, 0));
 
+        particle.ChangeSpeedRaw(player.rb.velocity*Time.deltaTime*5);
+
         shootElectron = !shootElectron;
 
         if (isElectron) ElectronOrder++;
