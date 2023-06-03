@@ -4,20 +4,24 @@ using UnityEngine;
 
 public class Particle : MonoBehaviour
 {
+
     public Vector3 direction;
     float speedMultiplier = 10;
+
+    float damage;
 
     Vector3 addedSpeed;
     Vector3 addedSpeedRaw;
 
     private void OnEnable()
     {
-        Reset();
+        ResetParticle();
     }
 
-    public void Reset()
+    public void ResetParticle()
     {
         StopCoroutine(ParticleExpiration());
+        damage = 0;
         direction= Vector3.zero;
         addedSpeed= Vector3.zero;
         addedSpeedRaw= Vector3.zero;
@@ -26,7 +30,12 @@ public class Particle : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.Translate((direction + addedSpeed) * Time.deltaTime * speedMultiplier + addedSpeedRaw);
+        transform.position += ((direction + addedSpeed) * speedMultiplier + addedSpeedRaw) * Time.deltaTime;
+    }
+
+    public void ChangeDamage(float damage)
+    {
+        this.damage = damage;
     }
 
     public void SetDirection(Vector3 direction)
@@ -52,6 +61,12 @@ public class Particle : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == Layers.wallLayer) gameObject.SetActive(false);
+        if (collision.gameObject.layer == 7) collision.GetComponent<Enemy>().TakeDamage(damage);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == 8) gameObject.SetActive(false);
+        print("Particle collided");
     }
 }

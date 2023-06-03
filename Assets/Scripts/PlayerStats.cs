@@ -66,6 +66,13 @@ public class PlayerStats : PlayerComponent
         set { _jumpForce = value; }
     }
 
+    float _damage = 10;
+    public float Damage
+    {
+        get { return _damage; }
+        set { _jumpForce = value; }
+    }
+
     public void TakeDamage(float damage)
     {
         Health -= damage;

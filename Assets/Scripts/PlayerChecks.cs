@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerChecks : PlayerComponent
 {
-    [SerializeField] LayerMask wallLayer;
-
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform wallCheck;
     [SerializeField] Transform hangCheck;
@@ -45,7 +43,7 @@ public class PlayerChecks : PlayerComponent
     public bool CanUncrouch()
     {
         Collider2D[] colls = Physics2D.OverlapBoxAll(uncrouchCheck.position, uncrouchCheckBounds, 0, Layers.wallLayer);
-        return (colls.Length < 0);
+        return (colls.Length <= 0);
     }
 
     private void OnDrawGizmos()

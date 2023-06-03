@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 public class ParticleShooter : PlayerComponent
 {
@@ -24,7 +25,7 @@ public class ParticleShooter : PlayerComponent
         set
         {
             _holeOrder = value;
-            if (_holeOrder >= Holes.Length) _holeOrder = 0;  
+            if (_holeOrder >= Holes.Length) _holeOrder = 0;
         }
     }
 
@@ -39,29 +40,29 @@ public class ParticleShooter : PlayerComponent
 
     private void Update()
     {
-        if(Input.GetKey(KeyCode.E) && canShoot)
+        if (Input.GetKey(KeyCode.E) && canShoot)
         {
-            if(shootElectron) ShootParticle(Electrons[ElectronOrder], true);
+            if (shootElectron) ShootParticle(Electrons[ElectronOrder], true);
             else ShootParticle(Holes[HoleOrder], false);
         }
     }
 
     IEnumerator FireWait()
     {
-        canShoot= false;
+        canShoot = false;
         yield return new WaitForSeconds(fireRate);
-        canShoot= true;
+        canShoot = true;
     }
 
     void ShootParticle(Particle particle, bool isElectron)
     {
         particle.gameObject.SetActive(true);
+
         particle.transform.position = transform.position + new Vector3(Random.Range(0f, 0.1f), Random.Range(0f, 0.1f));
 
-        if (player.dir.y != 0) particle.SetDirection(new Vector3(player.dir.x, player.dir.y));
-        else particle.SetDirection(new Vector3(player.facingDirection, 0));
+        particle.SetDirection(new Vector3(player.facingDirection, 0));
 
-        particle.ChangeSpeedRaw(player.rb.velocity*Time.deltaTime*5);
+        ParticleModifiers(particle);
 
         shootElectron = !shootElectron;
 
@@ -69,5 +70,11 @@ public class ParticleShooter : PlayerComponent
         else HoleOrder++;
 
         StartCoroutine(FireWait());
+    }
+
+    void ParticleModifiers(Particle particle)
+    {
+        particle.ChangeDamage(player.stats.Damage);
+        particle.ChangeSpeedRaw(player.rb.velocity * 5);
     }
 }
